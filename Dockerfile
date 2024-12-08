@@ -1,17 +1,25 @@
-# Gunakan image Python resmi sebagai base
-FROM python:3.9-slim
+# Use the official Node.js image.
+FROM node:18
 
-# Set working directory
-WORKDIR /app
+# Create and change to the app directory.
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV MODEL_URL='https://storage.googleapis.com/ml-models-buckets-nic/model-in-prod/model.json'
 
-# Salin semua file ke container
+# Copy local code to the container image.
 COPY . .
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && \
+    apt-get install -y build-essential \
+    wget \
+    python3 \
+    make \
+    gcc \
+    libc6-dev
 
-# Expose port 8080 (Cloud Run menggunakan port ini)
+
+RUN npm install
+
 EXPOSE 8080
 
-# Jalankan aplikasi Flask
-CMD ["python", "app.py"]
+CMD [ "npm", "run", "prod" ]
